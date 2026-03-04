@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Location — GuardRailNow Location Scouting</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header>
+    <div class="container">
+      <div class="header-inner">
+        <a href="index.html" class="logo">GuardR<span>ai</span>lNow</a>
+        <nav class="header-nav"></nav>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="page-hero">
+      <div class="container">
+        <h1>Scout a New Location</h1>
+        <p>Document a potential outreach location. The address will be automatically geocoded for the map.</p>
+      </div>
+    </div>
+
+    <div class="form-wrap">
+      <div class="container">
+
+        <div id="alert-success" class="alert success">
+          Location saved! <a href="index.html" style="color:var(--success-text);text-decoration:underline;">View on map</a>
+        </div>
+        <div id="alert-error" class="alert error"></div>
+
+        <form id="location-form" novalidate>
+
+          <div class="form-section">
+            <div class="form-section-title">Location Details</div>
+            <div class="form-group">
+              <label for="location_name">Location Name</label>
+              <input type="text" id="location_name" name="location_name" required placeholder="e.g. Fifth & Elm Farmers Market">
+            </div>
+            <div class="form-group">
+              <label for="location_type">Location Type</label>
+              <select id="location_type" name="location_type" required>
+                <option value="">-- select type --</option>
+                <option value="Farmers Market">Farmers Market</option>
+                <option value="Art Walk">Art Walk</option>
+                <option value="Festival/Fair">Festival / Fair</option>
+                <option value="Community Event">Community Event</option>
+                <option value="Library">Library</option>
+                <option value="Campus">Campus</option>
+                <option value="Park">Park</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="address">Street Address</label>
+              <input type="text" id="address" name="address" required placeholder="123 Main St, Portland, TX 78374">
+              <div id="geocode-status" class="geocoding-status"></div>
+            </div>
+            <div class="form-row-3">
+              <div class="form-group">
+                <label for="city">City</label>
+                <input type="text" id="city" name="city" required placeholder="Portland">
+              </div>
+              <div class="form-group">
+                <label for="state">State</label>
+                <input type="text" id="state" name="state" required placeholder="TX" maxlength="2">
+              </div>
+              <div class="form-group">
+                <label for="status">Status</label>
+                <select id="status" name="status">
+                  <option value="Not Yet Contacted" selected>Not Yet Contacted</option>
+                  <option value="Contacted">Contacted</option>
+                  <option value="Approved">Approved</option>
+                  <option value="Rejected">Rejected</option>
+                  <option value="Expired">Expired</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="latitude">Latitude <span class="optional">auto-filled</span></label>
+                <input type="number" id="latitude" name="latitude" step="0.000001" placeholder="27.877472">
+              </div>
+              <div class="form-group">
+                <label for="longitude">Longitude <span class="optional">auto-filled</span></label>
+                <input type="number" id="longitude" name="longitude" step="0.000001" placeholder="-97.325779">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section" id="rejection-section" style="display:none;">
+            <div class="form-section-title">Rejection Details</div>
+            <div class="form-group">
+              <label for="rejection_reason">Rejection Reason</label>
+              <textarea id="rejection_reason" name="rejection_reason" placeholder="Why was this location rejected?" rows="3"></textarea>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="form-section-title">Contact Information</div>
+            <div class="form-group">
+              <label for="contact_person">Contact Person <span class="optional">optional</span></label>
+              <input type="text" id="contact_person" name="contact_person" placeholder="Market manager name">
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="contact_email">Contact Email <span class="optional">optional</span></label>
+                <input type="email" id="contact_email" name="contact_email" placeholder="manager@example.com">
+              </div>
+              <div class="form-group">
+                <label for="contact_phone">Contact Phone <span class="optional">optional</span></label>
+                <input type="tel" id="contact_phone" name="contact_phone" placeholder="(555) 000-0000">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="form-section-title">Logistics</div>
+            <div class="checkbox-group">
+              <input type="checkbox" id="permit_required" name="permit_required">
+              <label for="permit_required">Permit or vendor application required</label>
+            </div>
+            <div class="form-group">
+              <label for="permit_details">Permit Details <span class="optional">optional</span></label>
+              <textarea id="permit_details" name="permit_details" placeholder="Application process, deadlines, requirements..." rows="2"></textarea>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="fee">Fee <span class="optional">optional, in USD</span></label>
+                <input type="number" id="fee" name="fee" step="0.01" min="0" placeholder="0.00">
+              </div>
+              <div class="form-group">
+                <label for="foot_traffic">Foot Traffic</label>
+                <select id="foot_traffic" name="foot_traffic">
+                  <option value="">-- estimate --</option>
+                  <option value="Low">Low</option>
+                  <option value="Moderate">Moderate</option>
+                  <option value="High">High</option>
+                  <option value="Very High">Very High</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="form-section-title">Timing</div>
+            <p class="form-hint">Check all days and seasons that apply.</p>
+            <div class="form-group">
+              <label>Best Days</label>
+              <div style="display:flex;flex-wrap:wrap;gap:0.75rem;">
+                <div class="checkbox-group"><input type="checkbox" id="day_mon" name="best_days[]" value="Mon"><label for="day_mon">Mon</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="day_tue" name="best_days[]" value="Tue"><label for="day_tue">Tue</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="day_wed" name="best_days[]" value="Wed"><label for="day_wed">Wed</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="day_thu" name="best_days[]" value="Thu"><label for="day_thu">Thu</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="day_fri" name="best_days[]" value="Fri"><label for="day_fri">Fri</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="day_sat" name="best_days[]" value="Sat"><label for="day_sat">Sat</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="day_sun" name="best_days[]" value="Sun"><label for="day_sun">Sun</label></div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="best_times">Best Times <span class="optional">optional</span></label>
+              <input type="text" id="best_times" name="best_times" placeholder="e.g. 8am-1pm">
+            </div>
+            <div class="form-group">
+              <label>Season</label>
+              <div style="display:flex;flex-wrap:wrap;gap:0.75rem;">
+                <div class="checkbox-group"><input type="checkbox" id="season_spring" name="season[]" value="Spring"><label for="season_spring">Spring</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="season_summer" name="season[]" value="Summer"><label for="season_summer">Summer</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="season_fall" name="season[]" value="Fall"><label for="season_fall">Fall</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="season_winter" name="season[]" value="Winter"><label for="season_winter">Winter</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="season_year" name="season[]" value="Year-Round"><label for="season_year">Year-Round</label></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="form-section-title">Additional Info</div>
+            <div class="form-group">
+              <label for="notes">Notes <span class="optional">optional</span></label>
+              <textarea id="notes" name="notes" placeholder="Parking, setup logistics, vibe, anything useful for future scouts..." rows="4"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="photo_link">Photo Link <span class="optional">optional</span></label>
+              <input type="url" id="photo_link" name="photo_link" placeholder="https://...">
+            </div>
+          </div>
+
+          <div class="form-submit">
+            <button type="submit" class="btn btn-primary" id="submit-btn">Save Location</button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>A project of <a href="https://www.guardrailnow.org" target="_blank" rel="noopener">GuardRailNow.org</a> &amp; the AI Risk Network.</p>
+    </div>
+  </footer>
+
+  <script src="js/auth.js"></script>
+  <script src="js/form.js"></script>
+  <script>
+    // Require auth
+    if (!Auth.requireAuth()) { /* redirected */ }
+
+    // Show/hide rejection reason based on status
+    document.getElementById('status').addEventListener('change', function() {
+      document.getElementById('rejection-section').style.display =
+        this.value === 'Rejected' ? 'block' : 'none';
+    });
+
+    // Geocode address on blur
+    let geocodeTimer;
+    document.getElementById('address').addEventListener('blur', function() {
+      const address = this.value.trim();
+      if (!address) return;
+
+      const statusEl = document.getElementById('geocode-status');
+      statusEl.textContent = 'Geocoding address...';
+      statusEl.className = 'geocoding-status';
+
+      clearTimeout(geocodeTimer);
+      geocodeTimer = setTimeout(async () => {
+        try {
+          const res = await fetch(
+            'https://nominatim.openstreetmap.org/search?' +
+            new URLSearchParams({ q: address, format: 'json', limit: '1' }),
+            { headers: { 'User-Agent': 'GuardRailNow-LocationScouting/1.0' } }
+          );
+          const results = await res.json();
+
+          if (results.length > 0) {
+            document.getElementById('latitude').value = parseFloat(results[0].lat).toFixed(6);
+            document.getElementById('longitude').value = parseFloat(results[0].lon).toFixed(6);
+            statusEl.textContent = 'Location found';
+            statusEl.className = 'geocoding-status success';
+          } else {
+            statusEl.textContent = 'Address not found — enter lat/lng manually';
+            statusEl.className = 'geocoding-status error';
+          }
+        } catch (err) {
+          console.error('Geocoding error:', err);
+          statusEl.textContent = 'Geocoding failed — enter lat/lng manually';
+          statusEl.className = 'geocoding-status error';
+        }
+      }, 300);
+    });
+
+    initForm({
+      formId: 'location-form',
+      endpoint: '/.netlify/functions/location-add',
+      submitBtnId: 'submit-btn',
+      successId: 'alert-success',
+      errorId: 'alert-error',
+      authRequired: true,
+    });
+  </script>
+</body>
+</html>

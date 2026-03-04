@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register as Scout — GuardRailNow Location Scouting</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header>
+    <div class="container">
+      <div class="header-inner">
+        <a href="index.html" class="logo">GuardR<span>ai</span>lNow</a>
+        <nav class="header-nav"></nav>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="page-hero">
+      <div class="container">
+        <h1>Register as a Scout</h1>
+        <p>Create an account to start scouting and tracking locations for community outreach.</p>
+      </div>
+    </div>
+
+    <div class="form-wrap">
+      <div class="container">
+
+        <div id="alert-success" class="alert success" style="display:none;"></div>
+        <div id="alert-error" class="alert error"></div>
+
+        <div id="pin-result" style="display:none;">
+          <div class="pin-display">
+            <div class="pin-label">Your login PIN</div>
+            <div class="pin-code" id="pin-code"></div>
+            <div class="pin-warning">Write this down! You'll need it to log in. We cannot recover it.</div>
+          </div>
+          <div style="text-align:center">
+            <a href="login.html" class="btn btn-primary">Log In Now</a>
+          </div>
+        </div>
+
+        <form id="register-form" novalidate>
+          <div class="form-section">
+            <div class="form-section-title">Your Information</div>
+            <div class="form-group">
+              <label for="full_name">Full Name</label>
+              <input type="text" id="full_name" name="full_name" required placeholder="Jane Smith">
+            </div>
+            <div class="form-group">
+              <label for="email">Email Address</label>
+              <input type="email" id="email" name="email" required placeholder="jane@example.com">
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="city">City</label>
+                <input type="text" id="city" name="city" required placeholder="Portland">
+              </div>
+              <div class="form-group">
+                <label for="state">State</label>
+                <input type="text" id="state" name="state" required placeholder="TX" maxlength="2">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-submit">
+            <button type="submit" class="btn btn-primary" id="submit-btn">Create Account</button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>A project of <a href="https://www.guardrailnow.org" target="_blank" rel="noopener">GuardRailNow.org</a> &amp; the AI Risk Network.</p>
+    </div>
+  </footer>
+
+  <script src="js/auth.js"></script>
+  <script src="js/form.js"></script>
+  <script>
+    initForm({
+      formId: 'register-form',
+      endpoint: '/.netlify/functions/register',
+      submitBtnId: 'submit-btn',
+      successId: 'alert-success',
+      errorId: 'alert-error',
+      onSuccess(data, form) {
+        form.style.display = 'none';
+        document.getElementById('pin-code').textContent = data.pin;
+        document.getElementById('pin-result').style.display = 'block';
+        document.getElementById('pin-result').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
+  </script>
+</body>
+</html>

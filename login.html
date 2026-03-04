@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Log In — GuardRailNow Location Scouting</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header>
+    <div class="container">
+      <div class="header-inner">
+        <a href="index.html" class="logo">GuardR<span>ai</span>lNow</a>
+        <nav class="header-nav"></nav>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="page-hero">
+      <div class="container">
+        <h1>Scout Login</h1>
+        <p>Enter your email and PIN to access scouting tools.</p>
+      </div>
+    </div>
+
+    <div class="form-wrap">
+      <div class="container">
+
+        <div id="alert-success" class="alert success"></div>
+        <div id="alert-error" class="alert error"></div>
+
+        <form id="login-form" novalidate>
+          <div class="form-section">
+            <div class="form-group">
+              <label for="email">Email Address</label>
+              <input type="email" id="email" name="email" required placeholder="jane@example.com">
+            </div>
+            <div class="form-group">
+              <label for="pin">PIN</label>
+              <input type="password" id="pin" name="pin" required placeholder="6-digit PIN" maxlength="6" pattern="[0-9]{6}" inputmode="numeric">
+            </div>
+          </div>
+
+          <div class="form-submit">
+            <button type="submit" class="btn btn-primary" id="submit-btn">Log In</button>
+          </div>
+
+          <p style="text-align:center;margin-top:1.5rem;color:var(--text-muted);font-size:0.9rem;">
+            Don't have an account? <a href="register.html" style="color:var(--amber-light);">Register as a Scout</a>
+          </p>
+        </form>
+
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>A project of <a href="https://www.guardrailnow.org" target="_blank" rel="noopener">GuardRailNow.org</a> &amp; the AI Risk Network.</p>
+    </div>
+  </footer>
+
+  <script src="js/auth.js"></script>
+  <script src="js/form.js"></script>
+  <script>
+    initForm({
+      formId: 'login-form',
+      endpoint: '/.netlify/functions/login',
+      submitBtnId: 'submit-btn',
+      successId: 'alert-success',
+      errorId: 'alert-error',
+      onSuccess(data) {
+        Auth.login(data.token, data.scout);
+        window.location.href = 'index.html';
+      }
+    });
+  </script>
+</body>
+</html>

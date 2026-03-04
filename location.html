@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Location Details — GuardRailNow Location Scouting</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body>
+
+  <header>
+    <div class="container">
+      <div class="header-inner">
+        <a href="index.html" class="logo">GuardR<span>ai</span>lNow</a>
+        <nav class="header-nav"></nav>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container" style="padding-top:2rem;padding-bottom:3rem;">
+
+      <div id="loading" style="text-align:center;padding:3rem;color:var(--text-muted);">Loading location...</div>
+      <div id="error-msg" class="alert error"></div>
+
+      <div id="detail-content" style="display:none;">
+
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
+          <div>
+            <h1 id="loc-name" style="font-family:'PT Serif',serif;font-size:clamp(1.4rem,3vw,2rem);margin-bottom:0.5rem;"></h1>
+            <div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;">
+              <span id="loc-status" class="status-badge"></span>
+              <span id="loc-type" style="color:var(--text-muted);font-size:0.85rem;"></span>
+            </div>
+          </div>
+          <div class="detail-actions" id="detail-actions"></div>
+        </div>
+
+        <div id="detail-map"></div>
+
+        <div class="detail-section">
+          <div class="detail-section-title">Location</div>
+          <div class="detail-grid">
+            <div class="detail-field">
+              <div class="detail-label">Address</div>
+              <div class="detail-value" id="loc-address"></div>
+            </div>
+            <div class="detail-field">
+              <div class="detail-label">City, State</div>
+              <div class="detail-value" id="loc-city-state"></div>
+            </div>
+            <div class="detail-field">
+              <div class="detail-label">Coordinates</div>
+              <div class="detail-value" id="loc-coords"></div>
+            </div>
+            <div class="detail-field">
+              <div class="detail-label">Foot Traffic</div>
+              <div class="detail-value" id="loc-traffic"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-section" id="contact-section">
+          <div class="detail-section-title">Contact</div>
+          <div class="detail-grid">
+            <div class="detail-field">
+              <div class="detail-label">Contact Person</div>
+              <div class="detail-value" id="loc-contact-person"></div>
+            </div>
+            <div class="detail-field">
+              <div class="detail-label">Email</div>
+              <div class="detail-value" id="loc-contact-email"></div>
+            </div>
+            <div class="detail-field">
+              <div class="detail-label">Phone</div>
+              <div class="detail-value" id="loc-contact-phone"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <div class="detail-section-title">Logistics</div>
+          <div class="detail-grid">
+            <div class="detail-field">
+              <div class="detail-label">Permit Required</div>
+              <div class="detail-value" id="loc-permit"></div>
+            </div>
+            <div class="detail-field">
+              <div class="detail-label">Fee</div>
+              <div class="detail-value" id="loc-fee"></div>
+            </div>
+            <div class="detail-field">
+              <div class="detail-label">Best Days</div>
+              <div class="detail-value" id="loc-days"></div>
+            </div>
+            <div class="detail-field">
+              <div class="detail-label">Best Times</div>
+              <div class="detail-value" id="loc-times"></div>
+            </div>
+            <div class="detail-field">
+              <div class="detail-label">Season</div>
+              <div class="detail-value" id="loc-season"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-section" id="permit-details-section" style="display:none;">
+          <div class="detail-section-title">Permit Details</div>
+          <div class="detail-notes" id="loc-permit-details"></div>
+        </div>
+
+        <div class="detail-section" id="rejection-section" style="display:none;">
+          <div class="detail-section-title">Rejection Reason</div>
+          <div class="detail-notes" id="loc-rejection"></div>
+        </div>
+
+        <div class="detail-section" id="notes-section" style="display:none;">
+          <div class="detail-section-title">Notes</div>
+          <div class="detail-notes" id="loc-notes"></div>
+        </div>
+
+        <div class="detail-section" id="photo-section" style="display:none;">
+          <div class="detail-section-title">Photo</div>
+          <div class="detail-value"><a id="loc-photo" href="#" target="_blank" rel="noopener"></a></div>
+        </div>
+
+        <div style="color:var(--text-muted);font-size:0.8rem;margin-top:2rem;padding-top:1rem;border-top:1px solid var(--border);">
+          <span id="loc-scouted-date"></span>
+          <span id="loc-updated"></span>
+        </div>
+      </div>
+
+      <!-- Edit form (hidden by default) -->
+      <div id="edit-content" style="display:none;">
+        <h2 style="font-family:'PT Serif',serif;font-size:1.5rem;margin-bottom:1.5rem;">Edit Location</h2>
+
+        <div id="edit-alert-success" class="alert success">Changes saved.</div>
+        <div id="edit-alert-error" class="alert error"></div>
+
+        <form id="edit-form" novalidate>
+
+          <div class="form-section">
+            <div class="form-section-title">Location Details</div>
+            <div class="form-group">
+              <label for="edit_location_name">Location Name</label>
+              <input type="text" id="edit_location_name" name="location_name" required>
+            </div>
+            <div class="form-group">
+              <label for="edit_location_type">Location Type</label>
+              <select id="edit_location_type" name="location_type" required>
+                <option value="">-- select type --</option>
+                <option value="Farmers Market">Farmers Market</option>
+                <option value="Art Walk">Art Walk</option>
+                <option value="Festival/Fair">Festival / Fair</option>
+                <option value="Community Event">Community Event</option>
+                <option value="Library">Library</option>
+                <option value="Campus">Campus</option>
+                <option value="Park">Park</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="edit_address">Address</label>
+              <input type="text" id="edit_address" name="address" required>
+              <div id="edit-geocode-status" class="geocoding-status"></div>
+            </div>
+            <div class="form-row-3">
+              <div class="form-group">
+                <label for="edit_city">City</label>
+                <input type="text" id="edit_city" name="city" required>
+              </div>
+              <div class="form-group">
+                <label for="edit_state">State</label>
+                <input type="text" id="edit_state" name="state" required maxlength="2">
+              </div>
+              <div class="form-group">
+                <label for="edit_status">Status</label>
+                <select id="edit_status" name="status">
+                  <option value="Not Yet Contacted">Not Yet Contacted</option>
+                  <option value="Contacted">Contacted</option>
+                  <option value="Approved">Approved</option>
+                  <option value="Rejected">Rejected</option>
+                  <option value="Expired">Expired</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="edit_latitude">Latitude</label>
+                <input type="number" id="edit_latitude" name="latitude" step="0.000001">
+              </div>
+              <div class="form-group">
+                <label for="edit_longitude">Longitude</label>
+                <input type="number" id="edit_longitude" name="longitude" step="0.000001">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section" id="edit-rejection-section" style="display:none;">
+            <div class="form-section-title">Rejection Details</div>
+            <div class="form-group">
+              <label for="edit_rejection_reason">Rejection Reason</label>
+              <textarea id="edit_rejection_reason" name="rejection_reason" rows="3"></textarea>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="form-section-title">Contact</div>
+            <div class="form-group">
+              <label for="edit_contact_person">Contact Person</label>
+              <input type="text" id="edit_contact_person" name="contact_person">
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="edit_contact_email">Contact Email</label>
+                <input type="email" id="edit_contact_email" name="contact_email">
+              </div>
+              <div class="form-group">
+                <label for="edit_contact_phone">Contact Phone</label>
+                <input type="tel" id="edit_contact_phone" name="contact_phone">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="form-section-title">Logistics</div>
+            <div class="checkbox-group">
+              <input type="checkbox" id="edit_permit_required" name="permit_required">
+              <label for="edit_permit_required">Permit required</label>
+            </div>
+            <div class="form-group">
+              <label for="edit_permit_details">Permit Details</label>
+              <textarea id="edit_permit_details" name="permit_details" rows="2"></textarea>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="edit_fee">Fee (USD)</label>
+                <input type="number" id="edit_fee" name="fee" step="0.01" min="0">
+              </div>
+              <div class="form-group">
+                <label for="edit_foot_traffic">Foot Traffic</label>
+                <select id="edit_foot_traffic" name="foot_traffic">
+                  <option value="">-- estimate --</option>
+                  <option value="Low">Low</option>
+                  <option value="Moderate">Moderate</option>
+                  <option value="High">High</option>
+                  <option value="Very High">Very High</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="form-section-title">Timing</div>
+            <div class="form-group">
+              <label>Best Days</label>
+              <div style="display:flex;flex-wrap:wrap;gap:0.75rem;">
+                <div class="checkbox-group"><input type="checkbox" id="edit_day_mon" name="best_days[]" value="Mon"><label for="edit_day_mon">Mon</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="edit_day_tue" name="best_days[]" value="Tue"><label for="edit_day_tue">Tue</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="edit_day_wed" name="best_days[]" value="Wed"><label for="edit_day_wed">Wed</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="edit_day_thu" name="best_days[]" value="Thu"><label for="edit_day_thu">Thu</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="edit_day_fri" name="best_days[]" value="Fri"><label for="edit_day_fri">Fri</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="edit_day_sat" name="best_days[]" value="Sat"><label for="edit_day_sat">Sat</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="edit_day_sun" name="best_days[]" value="Sun"><label for="edit_day_sun">Sun</label></div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="edit_best_times">Best Times</label>
+              <input type="text" id="edit_best_times" name="best_times">
+            </div>
+            <div class="form-group">
+              <label>Season</label>
+              <div style="display:flex;flex-wrap:wrap;gap:0.75rem;">
+                <div class="checkbox-group"><input type="checkbox" id="edit_season_spring" name="season[]" value="Spring"><label for="edit_season_spring">Spring</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="edit_season_summer" name="season[]" value="Summer"><label for="edit_season_summer">Summer</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="edit_season_fall" name="season[]" value="Fall"><label for="edit_season_fall">Fall</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="edit_season_winter" name="season[]" value="Winter"><label for="edit_season_winter">Winter</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="edit_season_year" name="season[]" value="Year-Round"><label for="edit_season_year">Year-Round</label></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="form-section-title">Additional Info</div>
+            <div class="form-group">
+              <label for="edit_notes">Notes</label>
+              <textarea id="edit_notes" name="notes" rows="4"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="edit_photo_link">Photo Link</label>
+              <input type="url" id="edit_photo_link" name="photo_link">
+            </div>
+          </div>
+
+          <div class="form-submit" style="display:flex;gap:1rem;">
+            <button type="submit" class="btn btn-primary" id="edit-submit-btn" style="flex:1;">Save Changes</button>
+            <button type="button" class="btn btn-secondary" onclick="cancelEdit()" style="flex:0 0 auto;">Cancel</button>
+          </div>
+
+        </form>
+      </div>
+
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>A project of <a href="https://www.guardrailnow.org" target="_blank" rel="noopener">GuardRailNow.org</a> &amp; the AI Risk Network.</p>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/form.js"></script>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const locationId = params.get('id');
+    let currentLocation = null;
+
+    if (!locationId) {
+      document.getElementById('loading').textContent = 'No location ID provided.';
+    } else {
+      loadLocation();
+    }
+
+    async function loadLocation() {
+      try {
+        const res = await fetch('/.netlify/functions/location-get?id=' + locationId);
+        if (!res.ok) throw new Error('Not found');
+        const data = await res.json();
+        currentLocation = data.location;
+        renderDetail(currentLocation);
+      } catch (err) {
+        document.getElementById('loading').style.display = 'none';
+        const errorEl = document.getElementById('error-msg');
+        errorEl.textContent = 'Location not found.';
+        errorEl.classList.add('show');
+      }
+    }
+
+    function statusClass(status) {
+      return (status || '').toLowerCase().replace(/\s+/g, '-');
+    }
+
+    function renderDetail(loc) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('detail-content').style.display = 'block';
+      document.title = loc.name + ' — GuardRailNow Location Scouting';
+
+      document.getElementById('loc-name').textContent = loc.name;
+      const badge = document.getElementById('loc-status');
+      badge.textContent = loc.status;
+      badge.className = 'status-badge ' + statusClass(loc.status);
+      document.getElementById('loc-type').textContent = loc.type;
+      document.getElementById('loc-address').textContent = loc.address;
+      document.getElementById('loc-city-state').textContent = [loc.city, loc.state].filter(Boolean).join(', ');
+      document.getElementById('loc-coords').textContent = (loc.lat && loc.lng) ? loc.lat + ', ' + loc.lng : 'N/A';
+      document.getElementById('loc-traffic').textContent = loc.footTraffic || 'N/A';
+
+      // Contact
+      const hasContact = loc.contactPerson || loc.contactEmail || loc.contactPhone;
+      document.getElementById('contact-section').style.display = hasContact ? 'block' : 'none';
+      document.getElementById('loc-contact-person').textContent = loc.contactPerson || 'N/A';
+      document.getElementById('loc-contact-email').innerHTML = loc.contactEmail
+        ? '<a href="mailto:' + loc.contactEmail + '">' + loc.contactEmail + '</a>' : 'N/A';
+      document.getElementById('loc-contact-phone').innerHTML = loc.contactPhone
+        ? '<a href="tel:' + loc.contactPhone + '">' + loc.contactPhone + '</a>' : 'N/A';
+
+      // Logistics
+      document.getElementById('loc-permit').textContent = loc.permitRequired ? 'Yes' : 'No';
+      document.getElementById('loc-fee').textContent = loc.fee != null ? '$' + Number(loc.fee).toFixed(2) : 'N/A';
+      document.getElementById('loc-days').textContent = (loc.bestDays && loc.bestDays.length) ? loc.bestDays.join(', ') : 'N/A';
+      document.getElementById('loc-times').textContent = loc.bestTimes || 'N/A';
+      document.getElementById('loc-season').textContent = (loc.season && loc.season.length) ? loc.season.join(', ') : 'N/A';
+
+      // Conditional sections
+      if (loc.permitDetails) {
+        document.getElementById('permit-details-section').style.display = 'block';
+        document.getElementById('loc-permit-details').textContent = loc.permitDetails;
+      }
+      if (loc.rejectionReason) {
+        document.getElementById('rejection-section').style.display = 'block';
+        document.getElementById('loc-rejection').textContent = loc.rejectionReason;
+      }
+      if (loc.notes) {
+        document.getElementById('notes-section').style.display = 'block';
+        document.getElementById('loc-notes').textContent = loc.notes;
+      }
+      if (loc.photoLink) {
+        document.getElementById('photo-section').style.display = 'block';
+        const link = document.getElementById('loc-photo');
+        link.href = loc.photoLink;
+        link.textContent = loc.photoLink;
+      }
+
+      // Dates
+      document.getElementById('loc-scouted-date').textContent = loc.scoutedDate ? 'Scouted: ' + loc.scoutedDate : '';
+      document.getElementById('loc-updated').textContent = loc.lastUpdated ? ' | Updated: ' + loc.lastUpdated : '';
+
+      // Edit button (logged in only)
+      const actions = document.getElementById('detail-actions');
+      if (Auth.isLoggedIn()) {
+        actions.innerHTML = '<button class="btn btn-secondary btn-sm" onclick="startEdit()">Edit</button>';
+      }
+
+      // Map
+      if (loc.lat && loc.lng) {
+        const map = L.map('detail-map').setView([loc.lat, loc.lng], 15);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; OpenStreetMap contributors',
+        }).addTo(map);
+        L.circleMarker([loc.lat, loc.lng], {
+          radius: 10,
+          fillColor: pinColor(loc.status),
+          color: '#fff',
+          weight: 2,
+          fillOpacity: 0.9,
+        }).addTo(map);
+      } else {
+        document.getElementById('detail-map').style.display = 'none';
+      }
+    }
+
+    function pinColor(status) {
+      switch (status) {
+        case 'Approved': return '#22c55e';
+        case 'Rejected': return '#ef4444';
+        case 'Contacted': return '#ffc55e';
+        case 'Expired': return '#8b5cf6';
+        default: return '#6b7280';
+      }
+    }
+
+    function startEdit() {
+      if (!Auth.isLoggedIn()) return;
+      const loc = currentLocation;
+      document.getElementById('detail-content').style.display = 'none';
+      document.getElementById('edit-content').style.display = 'block';
+
+      // Populate form
+      document.getElementById('edit_location_name').value = loc.name;
+      document.getElementById('edit_location_type').value = loc.type;
+      document.getElementById('edit_address').value = loc.address;
+      document.getElementById('edit_city').value = loc.city;
+      document.getElementById('edit_state').value = loc.state;
+      document.getElementById('edit_status').value = loc.status;
+      document.getElementById('edit_latitude').value = loc.lat || '';
+      document.getElementById('edit_longitude').value = loc.lng || '';
+      document.getElementById('edit_contact_person').value = loc.contactPerson;
+      document.getElementById('edit_contact_email').value = loc.contactEmail;
+      document.getElementById('edit_contact_phone').value = loc.contactPhone;
+      document.getElementById('edit_permit_required').checked = loc.permitRequired;
+      document.getElementById('edit_permit_details').value = loc.permitDetails;
+      document.getElementById('edit_fee').value = loc.fee || '';
+      document.getElementById('edit_foot_traffic').value = loc.footTraffic;
+      document.getElementById('edit_best_times').value = loc.bestTimes;
+      document.getElementById('edit_notes').value = loc.notes;
+      document.getElementById('edit_photo_link').value = loc.photoLink;
+      document.getElementById('edit_rejection_reason').value = loc.rejectionReason;
+
+      // Checkboxes: best days
+      document.querySelectorAll('[name="best_days[]"]').forEach(cb => {
+        cb.checked = (loc.bestDays || []).includes(cb.value);
+      });
+      // Checkboxes: season
+      document.querySelectorAll('[name="season[]"]').forEach(cb => {
+        cb.checked = (loc.season || []).includes(cb.value);
+      });
+
+      // Show rejection section if needed
+      document.getElementById('edit-rejection-section').style.display =
+        loc.status === 'Rejected' ? 'block' : 'none';
+
+      document.getElementById('edit_status').addEventListener('change', function() {
+        document.getElementById('edit-rejection-section').style.display =
+          this.value === 'Rejected' ? 'block' : 'none';
+      });
+
+      // Geocode on address blur
+      document.getElementById('edit_address').addEventListener('blur', async function() {
+        const address = this.value.trim();
+        if (!address) return;
+        const statusEl = document.getElementById('edit-geocode-status');
+        statusEl.textContent = 'Geocoding...';
+        statusEl.className = 'geocoding-status';
+        try {
+          const res = await fetch(
+            'https://nominatim.openstreetmap.org/search?' +
+            new URLSearchParams({ q: address, format: 'json', limit: '1' }),
+            { headers: { 'User-Agent': 'GuardRailNow-LocationScouting/1.0' } }
+          );
+          const results = await res.json();
+          if (results.length > 0) {
+            document.getElementById('edit_latitude').value = parseFloat(results[0].lat).toFixed(6);
+            document.getElementById('edit_longitude').value = parseFloat(results[0].lon).toFixed(6);
+            statusEl.textContent = 'Location found';
+            statusEl.className = 'geocoding-status success';
+          } else {
+            statusEl.textContent = 'Not found';
+            statusEl.className = 'geocoding-status error';
+          }
+        } catch {
+          statusEl.textContent = 'Geocoding failed';
+          statusEl.className = 'geocoding-status error';
+        }
+      });
+    }
+
+    function cancelEdit() {
+      document.getElementById('edit-content').style.display = 'none';
+      document.getElementById('detail-content').style.display = 'block';
+    }
+
+    // Init edit form
+    initForm({
+      formId: 'edit-form',
+      endpoint: '/.netlify/functions/location-update?id=' + locationId,
+      submitBtnId: 'edit-submit-btn',
+      successId: 'edit-alert-success',
+      errorId: 'edit-alert-error',
+      authRequired: true,
+      method: 'PATCH',
+      onSuccess() {
+        window.location.reload();
+      }
+    });
+  </script>
+</body>
+</html>

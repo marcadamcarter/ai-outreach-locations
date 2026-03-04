@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Location Scouting — GuardRailNow AI Risk Network</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body>
+
+  <header>
+    <div class="container-wide">
+      <div class="header-inner">
+        <a href="index.html" class="logo">GuardR<span>ai</span>lNow</a>
+        <nav class="header-nav"></nav>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container-wide" style="padding-top:1.5rem;padding-bottom:3rem;">
+
+      <div class="map-toolbar">
+        <h2>Scouted Locations</h2>
+        <div id="add-location-btn"></div>
+      </div>
+
+      <div id="map"></div>
+
+      <div class="filters">
+        <select id="filter-status" onchange="Locations.applyFilters()">
+          <option value="">All Statuses</option>
+          <option value="Not Yet Contacted">Not Yet Contacted</option>
+          <option value="Contacted">Contacted</option>
+          <option value="Approved">Approved</option>
+          <option value="Rejected">Rejected</option>
+          <option value="Expired">Expired</option>
+        </select>
+        <select id="filter-type" onchange="Locations.applyFilters()">
+          <option value="">All Types</option>
+          <option value="Farmers Market">Farmers Market</option>
+          <option value="Art Walk">Art Walk</option>
+          <option value="Festival/Fair">Festival / Fair</option>
+          <option value="Community Event">Community Event</option>
+          <option value="Library">Library</option>
+          <option value="Campus">Campus</option>
+          <option value="Park">Park</option>
+          <option value="Other">Other</option>
+        </select>
+        <select id="filter-city" onchange="Locations.applyFilters()">
+          <option value="">All Cities</option>
+        </select>
+        <span class="filter-count" id="filter-count"></span>
+      </div>
+
+      <div id="location-list" class="location-list">
+        <div class="empty-state"><p>Loading locations...</p></div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer>
+    <div class="container-wide">
+      <p>A project of <a href="https://www.guardrailnow.org" target="_blank" rel="noopener">GuardRailNow.org</a> &amp; the AI Risk Network.</p>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/locations.js"></script>
+  <script>
+    // Init map
+    MapView.init('map');
+
+    // Show "Add Location" button if logged in
+    if (Auth.isLoggedIn()) {
+      document.getElementById('add-location-btn').innerHTML =
+        '<a href="add-location.html" class="btn btn-primary btn-sm">Add Location</a>';
+    }
+
+    // Load locations
+    Locations.load();
+  </script>
+</body>
+</html>
